@@ -79,7 +79,7 @@ MAC_ADDRESS="$(cat /sys/class/net/wlan0/address)"
 
 # Install dependencies
 sudo apt -y update
-sudo apt -y upgrade
+# sudo apt -y upgrade
 sudo apt -y install dnsmasq dhcpcd hostapd cron
 
 # Populate `/etc/udev/rules.d/70-persistent-net.rules`
@@ -126,14 +126,13 @@ EOF
 
 # Populate `/etc/wpa_supplicant/wpa_supplicant.conf`
 sudo bash -c 'cat > /etc/wpa_supplicant/wpa_supplicant.conf' << EOF
-country=US
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
+country=IN
 
 network={
     ssid="${CLIENT_SSID}"
     $([ $CLIENT_PASSPHRASE ] && echo "psk=\"${CLIENT_PASSPHRASE}\"")
-    id_str="AP1"
 }
 EOF
 
@@ -153,9 +152,8 @@ iface ap0 inet static
     hostapd /etc/hostapd/hostapd.conf
 
 allow-hotplug wlan0
-iface wlan0 inet manual
-    wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
-iface AP1 inet dhcp
+iface wlan0 inet dhcp
+    wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 EOF
 
 # Populate `/bin/start_wifi.sh`
